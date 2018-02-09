@@ -32,25 +32,24 @@ public class HelloController {
 		return "Hello Welcome";
 	}
 
+	/* Storing JSON  */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/{uriType}", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<Object> createSchema(@RequestHeader HttpHeaders headers, @RequestBody String entity)
 			throws Exception {
 
-		File schemaFile = new File("C:\\Users\\Siddhant Chandiwal\\Desktop\\final-json-schema.json");
+		File schemaFile = new File("C:\\Users\\Siddhant Chandiwal\\Documents\\workspace-sts-3.9.2.RELEASE\\gs-spring-boot-initial\\src\\main\\resources\\final-json-schema.json");
 		String str = FileUtils.readFileToString(schemaFile);
 
 		try {
-			System.out.println("Checking now " + Utils.isJsonValid(str, entity));
+			System.out.println("Validating Schema now " + Utils.isJsonValid(str, entity));
 			if (Utils.isJsonValid(str, entity)) {
 				System.out.println("Valid!");
 				Jedis jedis = new Jedis("127.0.0.1", 6379);
 
 				UUID uuid = UUID.randomUUID();
 				String taskId = uuid.toString();
-
 				System.out.println("Task Id " + taskId);
-
 				try {
 					ObjectMapper mapper = new ObjectMapper();
 					Map<String, Object> map = new HashMap<String, Object>();
@@ -66,7 +65,7 @@ public class HelloController {
 
 			} else {
 				System.out.println("NOT valid!");
-				return new ResponseEntity("Invalid JSON Schema", org.springframework.http.HttpStatus.BAD_REQUEST);
+				return new ResponseEntity("Invalid JSON Data", org.springframework.http.HttpStatus.BAD_REQUEST);
 			}
 		} catch (ProcessingException e) {
 			e.printStackTrace();
@@ -82,7 +81,8 @@ public class HelloController {
 
 		JSONParser parser = new JSONParser();
 		Jedis jedis = new Jedis("127.0.0.1", 6379);
-
+		
+		try {
 		System.out.println("ID Value is " + id);
 		String result = jedis.get(id);
 
@@ -92,6 +92,10 @@ public class HelloController {
 		System.out.println("Inside Get Method");
 
 		return new ResponseEntity(result, httpHeaders, org.springframework.http.HttpStatus.OK);
+		}catch(Exception e) {
+			System.out.println("Requested Data not found");
+			return new ResponseEntity("Requested Data not Found", org.springframework.http.HttpStatus.NOT_FOUND);
+		}
 
 	}
 
