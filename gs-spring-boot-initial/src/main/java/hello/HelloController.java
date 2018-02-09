@@ -27,12 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RestController
 public class HelloController {
 
-	@RequestMapping("/")
-	public String index() {
-		return "Hello Welcome";
-	}
-
-	/* Storing JSON  */
+	/* Storing JSON Data into Redis */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/{uriType}", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<Object> createSchema(@RequestHeader HttpHeaders headers, @RequestBody String entity)
@@ -61,7 +56,8 @@ public class HelloController {
 					e.printStackTrace();
 				}
 				HttpHeaders httpHeaders = new HttpHeaders();
-				return new ResponseEntity("Object Stored with ID: Plan-" +taskId, httpHeaders, org.springframework.http.HttpStatus.CREATED);
+				return new ResponseEntity("Object Stored with ID: Plan-" + taskId, httpHeaders,
+						org.springframework.http.HttpStatus.CREATED);
 
 			} else {
 				System.out.println("NOT valid!");
@@ -75,40 +71,42 @@ public class HelloController {
 		return null;
 	}
 
-	// display id data of a user
+	// display entire data
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Object> get(@RequestHeader HttpHeaders headers, @PathVariable String id) throws Exception {
 
-		JSONParser parser = new JSONParser();
 		Jedis jedis = new Jedis("127.0.0.1", 6379);
-		
 		System.out.println("ID Value is " + id);
 		String result = jedis.get(id);
-		
-		if(result != null){
+		if (result != null) {
 			System.out.println("Result Value is " + result);
 			HttpHeaders httpHeaders = new HttpHeaders();
 			return new ResponseEntity(result, httpHeaders, org.springframework.http.HttpStatus.OK);
-		}else{
-			return new ResponseEntity("Requested Data not Found", org.springframework.http.HttpStatus.BAD_REQUEST);
+		} else {
+			return new ResponseEntity("Requested Data not Found", org.springframework.http.HttpStatus.NOT_FOUND);
 		}
-
-		
-
 	}
 
-	// delete id for a user
+	// delete id
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = "application/json")
 	public ResponseEntity<Object> del(@RequestHeader HttpHeaders headers, @PathVariable String id) throws Exception {
 
 		JSONParser parser = new JSONParser();
 		Jedis jedis = new Jedis("127.0.0.1", 6379);
-		Long result = jedis.del(id);
-		HttpHeaders httpHeaders = new HttpHeaders();
-		System.out.println("Deleting the Object now");
-
-		return new ResponseEntity("Object is now deleted", httpHeaders, org.springframework.http.HttpStatus.OK);
-
+		if(jedis.exists(id)) {
+			System.out.println("Id exists in database");
+			Long result = jedis.del(id);
+			HttpHeaders httpHeaders = new HttpHeaders();
+			System.out.println("Deleting the Object now");
+			return new ResponseEntity("Requested Task is now deleted", httpHeaders,	org.springframework.http.HttpStatus.OK);
+		}else {
+			System.out.println("ID does not exists in database");
+			return new ResponseEntity("ID not found in database", org.springframework.http.HttpStatus.NOT_FOUND);
+		}	     	
 	}
-
+	
+	
+	
+	
+	
 }
