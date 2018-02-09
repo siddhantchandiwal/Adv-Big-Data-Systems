@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "_id": {
+      "type": "string"
+    },
+    "_type": {
+      "type": "string"
+    },
+    "creationDate12": {
+      "type": "string"
+    },
+    "linkedPlanServices": {
+      "items": {
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "_type": {
+            "type": "string"
+          },
+          "linkedService": {
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "_type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "planserviceCostShares": {
+            "properties": {
+              "_id": {
+                "type": "string"
+              },
+              "_type": {
+                "type": "string"
+              },
+              "copay": {
+                "type": "integer"
+              },
+              "deductible": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "planCostShares": {
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "_type": {
+          "type": "string"
+        },
+        "copay": {
+          "type": "integer"
+        },
+        "deductible": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}
