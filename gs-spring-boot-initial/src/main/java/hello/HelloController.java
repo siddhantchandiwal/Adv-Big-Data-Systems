@@ -82,20 +82,18 @@ public class HelloController {
 		JSONParser parser = new JSONParser();
 		Jedis jedis = new Jedis("127.0.0.1", 6379);
 		
-		try {
 		System.out.println("ID Value is " + id);
 		String result = jedis.get(id);
-
-		System.out.println("Result Value is " + result);
-		HttpHeaders httpHeaders = new HttpHeaders();
-
-		System.out.println("Inside Get Method");
-
-		return new ResponseEntity(result, httpHeaders, org.springframework.http.HttpStatus.OK);
-		}catch(Exception e) {
-			System.out.println("Requested Data not found");
-			return new ResponseEntity("Requested Data not Found", org.springframework.http.HttpStatus.NOT_FOUND);
+		
+		if(result != null){
+			System.out.println("Result Value is " + result);
+			HttpHeaders httpHeaders = new HttpHeaders();
+			return new ResponseEntity(result, httpHeaders, org.springframework.http.HttpStatus.OK);
+		}else{
+			return new ResponseEntity("Requested Data not Found", org.springframework.http.HttpStatus.BAD_REQUEST);
 		}
+
+		
 
 	}
 
