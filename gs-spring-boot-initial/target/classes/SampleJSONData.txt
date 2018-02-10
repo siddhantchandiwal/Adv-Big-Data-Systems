@@ -1,0 +1,40 @@
+{
+	"_type": "plan",
+	"_id": "12xvxc345",
+	"creationDate12": "12-2016",
+	"planCostShares": {
+		"copay": 10,
+		"_type": "membercostshare",
+		"_id": "1234vxc2324",
+		"deductible": 20
+	},
+	"linkedPlanServices":[ {
+		"_type": "planservice",
+		"_id": "27283xvx9",
+		"planserviceCostShares": {
+			"copay": 125,
+			"_type": "membercostshare",
+			"_id": "1234512xvc1314",
+			"deductible": 10
+		},
+		"linkedService": {
+			"_type": "service",
+			"_id": "1234520xvc30"
+		}
+	},{
+		"_type": "planservice",
+		"_id": "27283xvx9a",	
+		"planserviceCostShares": {
+			"copay": 125,
+			"_type": "membercostshare",
+			"_id": "1234512xvc1314a",
+			"deductible": 10
+		},
+		"linkedService": {
+			"_type": "service",
+			"_id": "1234520xvc30a"
+		}
+	}
+	
+	]
+}
