@@ -10,10 +10,12 @@ import redis.clients.jedis.Jedis;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RestController
 public class HelloController {
 
+	
 	/* Storing JSON Data into Redis */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/{uriType}", method = RequestMethod.POST, consumes = "application/json")
@@ -35,6 +38,19 @@ public class HelloController {
 
 		File schemaFile = new File("C:\\Users\\Siddhant Chandiwal\\Documents\\workspace-sts-3.9.2.RELEASE\\gs-spring-boot-initial\\src\\main\\resources\\final-json-schema.json");
 		String str = FileUtils.readFileToString(schemaFile);
+		
+		JSONObject object = new JSONObject();
+		JSONParser parser = new JSONParser();
+		
+		object = (JSONObject) parser.parse(entity);
+		MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+		byte[] bytesOfMessage = object.toJSONString().getBytes("UTF-8");
+		byte[] thedigest = messageDigest.digest(bytesOfMessage);
+		String eTag = thedigest.toString();
+		object.put("ETag", eTag);
+		
+		HttpHeaders httpHeaders = new HttpHeaders();
+		
 
 		try {
 			System.out.println("Validating Schema now " + Utils.isJsonValid(str, entity));
@@ -55,7 +71,8 @@ public class HelloController {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				HttpHeaders httpHeaders = new HttpHeaders();
+				//HttpHeaders httpHeaders = new HttpHeaders();
+				httpHeaders.set("ETag", eTag);
 				return new ResponseEntity("Object Stored with ID: Plan-" + taskId, httpHeaders,
 						org.springframework.http.HttpStatus.CREATED);
 
@@ -70,6 +87,35 @@ public class HelloController {
 		}
 		return null;
 	}
+	
+	
+	/*@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/{uriType}", method = RequestMethod.POST, consumes = "application/json")
+	public ResponseEntity<Object> create(@RequestHeader HttpHeaders headers, @RequestBody String entity)
+			throws Exception {
+
+		JSONObject object = new JSONObject();
+		JSONParser parser = new JSONParser();
+		Jedis jedis = new Jedis("127.0.0.1");
+		object = (JSONObject) parser.parse(entity);
+		
+		System.out.println("Value of object is "+object);
+		String value = jedis.set("Test" + object.get("id"), object.toString());
+		System.out.println(jedis.get("Test" + object.get("id")));
+
+		MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+		byte[] bytesOfMessage = object.toJSONString().getBytes("UTF-8");
+		byte[] thedigest = messageDigest.digest(bytesOfMessage);
+		String eTag = thedigest.toString();
+		object.put("ETag", eTag);
+
+		value = jedis.set("Test" + object.get("id"), object.toString());
+		String j = object.toString();
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set("ETag", eTag);
+		return new ResponseEntity(j, httpHeaders, org.springframework.http.HttpStatus.CREATED);
+
+	} */
 
 	// display entire data
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = "application/json")
